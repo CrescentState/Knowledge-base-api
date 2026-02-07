@@ -1,0 +1,25 @@
+# .ruff.toml
+target-version = "py312"
+line-length = 88
+
+[lint]
+# List of rules to enable
+# E/W: Error/Warning (PEP8)
+# F: Pyflakes
+# I: Isort (Import sorting)
+# N: pep8-naming
+# B: flake8-bugbear (Common bugs)
+# ANN: flake8-annotations (Enforces Type Hints)
+# UP: pyupgrade (Modern Python syntax)
+select = ["E", "F", "W", "I", "N", "B", "ANN", "UP", "SIM", "TCH"]
+ignore = ["ANN101", "ANN102"] # Don't require types for 'self' and 'cls'
+
+[lint.flake8-annotations]
+allow-star-arg-any = true
+
+[lint.isort]
+known-first-party = ["app"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
