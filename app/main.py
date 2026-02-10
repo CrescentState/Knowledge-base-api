@@ -1,25 +1,45 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
+from app.services.document import DocumentProcessor
+
+state = {}
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # --- Startup Logic ---
+    print("🚀 Initializing Heavy AI Models (Docling)...")
+    app.state.processor = DocumentProcessor()
+    yield
+    # --- Shutdown Logic ---
+    print("🛑 Cleaning up resources...")
+    state.clear()
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan,
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific domains
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
-@app.get("/health", tags=["system"])
-async def health_check() -> dict[str, str | bool]:
-    """
-    Standard health check for monitoring systems.
-    """
-    return {
-        "status": "active",
-        "version": settings.VERSION,
-        "debug_mode": settings.DEBUG,
-    }
-
-
 app.include_router(api_v1_router, prefix=settings.API_V1_STR)
+
+
+@app.get("/health", tags=["system"])
+async def health_check() -> dict[str, str]:
+    return {"status": "active", "version": settings.VERSION}

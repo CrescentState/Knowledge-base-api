@@ -1,18 +1,20 @@
 import shutil
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from app.schemas.document import ExtractionResult
-from app.services.document import DocumentProcessor
 
 router = APIRouter(prefix="/documents", tags=["documents"])
-processor = DocumentProcessor()
 file_param = File(...)
 
 
 @router.post("/upload", response_model=ExtractionResult)
-async def upload_document(file: UploadFile = file_param) -> ExtractionResult:
+async def upload_document(
+    request: Request, file: UploadFile = file_param
+) -> ExtractionResult:
+    processor = request.app.state.processor
+
     if not file.filename or not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
