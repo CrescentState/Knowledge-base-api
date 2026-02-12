@@ -1,39 +1,52 @@
 import time
 from pathlib import Path
-from typing import Any
 
 from docling.document_converter import DocumentConverter
+from loguru import logger
 
 from app.schemas.document import ExtractionResult
 
 
 class DocumentProcessor:
     def __init__(self) -> None:
-        # Initialize the converter (This can be expensive, so we do it once)
+        logger.info("Initializing DocumentProcessor with Docling models...")
         self.converter = DocumentConverter()
 
     async def process_pdf(self, file_path: Path) -> ExtractionResult:
-        """
-        Processes a PDF and returns structured Markdown content.
-        """
+        # "Bind" the filename to all logs in this scope
+        log = logger.bind(filename=file_path.name)
+
+        log.info(f"Starting extraction for: {file_path.name}")
         start_time = time.perf_counter()
 
-        # Perform the conversion
-        result = self.converter.convert(file_path)
+        try:
+            # The conversion process
+            result = self.converter.convert(file_path)
 
-        # Export to Markdown (Industry standard for LLM ingestion)
-        markdown_content = result.document.export_to_markdown()
+            end_time = time.perf_counter()
+            total_duration = end_time - start_time
 
-        execution_time = time.perf_counter() - start_time
+            # Metadata extraction
+            page_count = (
+                len(result.document.pages) if hasattr(result.document, "pages") else 1
+            )
+            avg_time_per_page = total_duration / page_count if page_count > 0 else 0
 
-        # Extract metadata safely
-        metadata: dict[str, Any] = {}
+            # Professional Granular Logging
+            log.success(f"Extraction complete for {file_path.name}")
+            log.info(f"Total Pages: {page_count}")
+            log.info(f"Total Time: {total_duration:.2f}s")
+            log.info(f"Avg Time Per Page: {avg_time_per_page:.2f}s")
 
-        return ExtractionResult(
-            content=markdown_content,
-            page_count=len(result.document.pages)
-            if hasattr(result.document, "pages")
-            else 1,
-            metadata=metadata,
-            processing_time_seconds=round(execution_time, 2),
-        )
+            return ExtractionResult(
+                content=result.document.export_to_markdown(),
+                page_count=page_count,
+                metadata=result.document.metadata.dict()
+                if hasattr(result.document, "metadata")
+                else {},
+                processing_time_seconds=round(total_duration, 2),
+            )
+
+        except Exception as e:
+            log.error(f"Failed to process document: {str(e)}")
+            raise e
