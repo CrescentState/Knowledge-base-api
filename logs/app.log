@@ -15,3 +15,9 @@
 2026-02-13 15:51:07.382 | SUCCESS  | app.api.v1.router:process_document_task:18 - Background processing complete: 1107 characters extracted.
 2026-02-13 15:51:07.383 | DEBUG    | app.api.v1.router:process_document_task:28 - Temporary file temp_Student Coordinators DL.pdf removed.
 2026-02-13 15:52:10.714 | INFO     | app.main:lifespan:25 - 🛑 Cleaning up resources...
+2026-02-14 16:54:23.876 | INFO     | app.api.v1.router:process_document_task:13 - Background processing started for test.pdf
+2026-02-14 16:54:23.877 | SUCCESS  | app.api.v1.router:process_document_task:18 - Background processing complete: 14 characters extracted.
+2026-02-14 16:54:23.877 | DEBUG    | app.api.v1.router:process_document_task:28 - Temporary file temp_test.pdf removed.
+2026-02-14 16:57:00.040 | INFO     | app.api.v1.router:process_document_task:13 - Background processing started for test.pdf
+2026-02-14 16:57:00.041 | SUCCESS  | app.api.v1.router:process_document_task:18 - Background processing complete: 14 characters extracted.
+2026-02-14 16:57:00.041 | DEBUG    | app.api.v1.router:process_document_task:28 - Temporary file temp_test.pdf removed.
