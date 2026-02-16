@@ -92,6 +92,30 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 The API will be available at `http://localhost:8000`
 
+### Running with Docker
+
+> Note: the Dockerfile in this repo is named `DockerFile` (capital **F**).
+
+1. **Build the image**
+   ```bash
+   docker build -f DockerFile -t knowledge-api .
+   ```
+
+2. **Run the container**
+   ```bash
+   docker run --rm -p 8000:8000 --name knowledge-api knowledge-api
+   ```
+
+   The API will be available at `http://localhost:8000`.
+
+3. **(Optional) Use a custom .env**
+   ```bash
+   docker run --rm -p 8000:8000 \
+     --env-file .env \
+     --name knowledge-api \
+     knowledge-api
+   ```
+
 ### Interactive API Documentation
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
@@ -107,8 +131,9 @@ curl http://localhost:8000/health
 - **GET** `/health` - System health status
 
 ### API v1
-- Base path: `/api/v1`
-- See [Interactive API Documentation](#interactive-api-documentation) for detailed endpoint documentation
+- **Base path**: `/api/v1`
+- **Document upload**: `POST /api/v1/documents/upload` (multipart form, field name: `file`, accepts `.pdf`)
+- See [Interactive API Documentation](#interactive-api-documentation) for full schema and response details.
 
 ## Usage Examples
 
@@ -117,12 +142,16 @@ curl http://localhost:8000/health
 curl -X GET http://localhost:8000/health
 ```
 
-### Document Processing
+### Document Upload (PDF)
 ```bash
-# Example request (see API documentation for specific endpoint)
-curl -X POST http://localhost:8000/api/v1/documents/process \
-  -H "Content-Type: application/json" \
-  -d '{"file_path": "/path/to/document.pdf"}'
+curl -X POST "http://localhost:8000/api/v1/documents/upload" \
+  -F "file=@/path/to/document.pdf;type=application/pdf"
+
+# Example 202 Accepted response
+# {
+#   "message": "File uploaded successfully. Processing has started in the background.",
+#   "filename": "document.pdf"
+# }
 ```
 
 ## Configuration
