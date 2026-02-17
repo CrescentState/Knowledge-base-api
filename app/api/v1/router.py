@@ -4,7 +4,12 @@ from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Request, UploadFile
 from loguru import logger
 
+from app.services.chunks import ChunkingService
+from app.services.vector import VectorService
+
 router = APIRouter(prefix="/documents", tags=["documents"])
+chunker = ChunkingService()
+vector_db = VectorService()
 
 
 # This is the "Worker" function that runs after the response is sent
@@ -13,6 +18,8 @@ async def process_document_task(processor: object, file_path: Path, original_nam
         logger.info(f"Background processing started for {original_name}")
         result = await processor.process_pdf(file_path)  # Our heavy Docling logic
 
+        chunks = chunker.create_chunks(result.content)
+        await vector_db.upsert_chunks(chunks, original_name)
         # FOR NOW: We just log the result.
         # IN PHASE 2: We will save this result to a database/Vector Store.
         logger.success(

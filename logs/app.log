@@ -21,3 +21,39 @@
 2026-02-14 16:57:00.040 | INFO     | app.api.v1.router:process_document_task:13 - Background processing started for test.pdf
 2026-02-14 16:57:00.041 | SUCCESS  | app.api.v1.router:process_document_task:18 - Background processing complete: 14 characters extracted.
 2026-02-14 16:57:00.041 | DEBUG    | app.api.v1.router:process_document_task:28 - Temporary file temp_test.pdf removed.
+2026-02-17 16:58:53.659 | INFO     | app.main:lifespan:21 - 🚀 Initializing Heavy AI Models (Docling)...
+2026-02-17 16:58:53.660 | INFO     | app.services.document:__init__:12 - Initializing DocumentProcessor with Docling models...
+2026-02-17 17:02:01.118 | INFO     | app.api.v1.router:process_document_task:18 - Background processing started for Student Coordinators DL.pdf
+2026-02-17 17:02:01.118 | INFO     | app.services.document:process_pdf:19 - Starting extraction for: temp_Student Coordinators DL.pdf
+2026-02-17 17:02:45.115 | SUCCESS  | app.services.document:process_pdf:36 - Extraction complete for temp_Student Coordinators DL.pdf
+2026-02-17 17:02:45.125 | INFO     | app.services.document:process_pdf:37 - Total Pages: 1
+2026-02-17 17:02:45.126 | INFO     | app.services.document:process_pdf:38 - Total Time: 44.00s
+2026-02-17 17:02:45.127 | INFO     | app.services.document:process_pdf:39 - Avg Time Per Page: 44.00s
+2026-02-17 17:02:45.492 | INFO     | app.services.chunks:create_chunks:27 - Generated 2 chunks.
+2026-02-17 17:02:50.470 | SUCCESS  | app.services.vector:upsert_chunks:36 - Successfully stored 2 chunks in ChromaDB.
+2026-02-17 17:02:50.471 | SUCCESS  | app.api.v1.router:process_document_task:25 - Background processing complete: 1107 characters extracted.
+2026-02-17 17:02:50.471 | DEBUG    | app.api.v1.router:process_document_task:35 - Temporary file temp_Student Coordinators DL.pdf removed.
+2026-02-17 17:05:33.690 | INFO     | app.main:lifespan:25 - 🛑 Cleaning up resources...
+2026-02-17 17:08:13.696 | INFO     | app.api.v1.router:process_document_task:18 - Background processing started for test.pdf
+2026-02-17 17:08:13.700 | INFO     | app.services.chunks:create_chunks:27 - Generated 1 chunks.
+2026-02-17 17:08:14.268 | SUCCESS  | app.services.vector:upsert_chunks:36 - Successfully stored 1 chunks in ChromaDB.
+2026-02-17 17:08:14.269 | SUCCESS  | app.api.v1.router:process_document_task:25 - Background processing complete: 14 characters extracted.
+2026-02-17 17:08:14.269 | DEBUG    | app.api.v1.router:process_document_task:35 - Temporary file temp_test.pdf removed.
+2026-02-17 17:12:27.918 | INFO     | app.api.v1.router:process_document_task:18 - Background processing started for test.pdf
+2026-02-17 17:12:27.932 | INFO     | app.services.chunks:create_chunks:27 - Generated 1 chunks.
+2026-02-17 17:12:28.278 | SUCCESS  | app.services.vector:upsert_chunks:38 - Successfully stored 1 chunks in ChromaDB.
+2026-02-17 17:12:28.279 | SUCCESS  | app.api.v1.router:process_document_task:25 - Background processing complete: 14 characters extracted.
+2026-02-17 17:12:28.281 | DEBUG    | app.api.v1.router:process_document_task:35 - Temporary file temp_test.pdf removed.
+2026-02-17 17:33:30.298 | INFO     | app.main:lifespan:21 - 🚀 Initializing Heavy AI Models (Docling)...
+2026-02-17 17:33:30.300 | INFO     | app.services.document:__init__:12 - Initializing DocumentProcessor with Docling models...
+2026-02-17 17:41:22.540 | INFO     | app.api.v1.router:process_document_task:18 - Background processing started for Student Coordinators DL.pdf
+2026-02-17 17:41:22.540 | INFO     | app.services.document:process_pdf:19 - Starting extraction for: temp_Student Coordinators DL.pdf
+2026-02-17 17:41:40.449 | SUCCESS  | app.services.document:process_pdf:36 - Extraction complete for temp_Student Coordinators DL.pdf
+2026-02-17 17:41:40.457 | INFO     | app.services.document:process_pdf:37 - Total Pages: 1
+2026-02-17 17:41:40.458 | INFO     | app.services.document:process_pdf:38 - Total Time: 17.91s
+2026-02-17 17:41:40.458 | INFO     | app.services.document:process_pdf:39 - Avg Time Per Page: 17.91s
+2026-02-17 17:41:40.617 | INFO     | app.services.chunks:create_chunks:28 - Generated 2 chunks.
+2026-02-17 17:41:43.024 | SUCCESS  | app.services.vector:upsert_chunks:39 - Successfully stored 2 chunks in ChromaDB.
+2026-02-17 17:41:43.024 | SUCCESS  | app.api.v1.router:process_document_task:25 - Background processing complete: 1107 characters extracted.
+2026-02-17 17:41:43.025 | DEBUG    | app.api.v1.router:process_document_task:35 - Temporary file temp_Student Coordinators DL.pdf removed.
+2026-02-17 17:45:03.166 | INFO     | app.main:lifespan:25 - 🛑 Cleaning up resources...

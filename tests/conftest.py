@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -6,12 +7,12 @@ from app.main import app
 
 
 @pytest.fixture(autouse=True)
-def mock_processor():
+def mock_processor() -> MagicMock:
     """Mocks the heavy Docling processor to keep tests fast."""
     mock = MagicMock()
 
     # Mock the return value of process_pdf (it must be a coroutine!)
-    async def fake_process(*args, **kwargs):
+    async def fake_process(*args: Any, **kwargs: Any) -> MagicMock:
         return MagicMock(content="Mocked Content", page_count=1)
 
     mock.process_pdf = fake_process
