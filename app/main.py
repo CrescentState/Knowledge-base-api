@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
+from app.api.v1 import router as doc_router
+from app.api.v1 import search as search_router
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
 from app.core.logging import setup_logging
@@ -42,6 +44,8 @@ app.add_middleware(
 
 
 app.include_router(api_v1_router, prefix=settings.API_V1_STR)
+app.include_router(doc_router.router, prefix="/api/v1")
+app.include_router(search_router.router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["system"])

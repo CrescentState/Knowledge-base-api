@@ -1,7 +1,9 @@
 import time
 from pathlib import Path
 
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
 from loguru import logger
 
 from app.schemas.document import ExtractionResult
@@ -10,7 +12,12 @@ from app.schemas.document import ExtractionResult
 class DocumentProcessor:
     def __init__(self) -> None:
         logger.info("Initializing DocumentProcessor with Docling models...")
-        self.converter = DocumentConverter()
+        pipeline_options = PdfPipelineOptions()
+        pipeline_options.do_ocr = True  # Ensure OCR is explicitly ON
+        pipeline_options.do_table_structure = True
+        self.converter = DocumentConverter(
+            format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
+        )
 
     async def process_pdf(self, file_path: Path) -> ExtractionResult:
         # "Bind" the filename to all logs in this scope
@@ -27,9 +34,7 @@ class DocumentProcessor:
             total_duration = end_time - start_time
 
             # Metadata extraction
-            page_count = (
-                len(result.document.pages) if hasattr(result.document, "pages") else 1
-            )
+            page_count = len(result.document.pages) if hasattr(result.document, "pages") else 1
             avg_time_per_page = total_duration / page_count if page_count > 0 else 0
 
             # Professional Granular Logging
