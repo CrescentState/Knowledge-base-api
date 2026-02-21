@@ -6,6 +6,7 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from loguru import logger
 
+from app.core.config import settings
 from app.schemas.document import ExtractionResult
 
 
@@ -13,7 +14,9 @@ class DocumentProcessor:
     def __init__(self) -> None:
         logger.info("Initializing DocumentProcessor with Docling models...")
         pipeline_options = PdfPipelineOptions()
-        pipeline_options.do_ocr = True  # Ensure OCR is explicitly ON
+        # Use PDF text layer only; no OCR. Avoids RapidOCR "empty result" warnings for text-based PDFs.
+        # Set do_ocr=True only if you need to process scanned/image-only PDFs.
+        pipeline_options.do_ocr = False
         pipeline_options.do_table_structure = True
         self.converter = DocumentConverter(
             format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
@@ -27,8 +30,15 @@ class DocumentProcessor:
         start_time = time.perf_counter()
 
         try:
+            # Optional limits for very large PDFs (0 = no limit)
+            kwargs: dict = {}
+            if settings.PDF_MAX_PAGES > 0:
+                kwargs["max_num_pages"] = settings.PDF_MAX_PAGES
+            if settings.PDF_MAX_FILE_SIZE_MB > 0:
+                kwargs["max_file_size"] = settings.PDF_MAX_FILE_SIZE_MB * 1024 * 1024
+
             # The conversion process
-            result = self.converter.convert(file_path)
+            result = self.converter.convert(file_path, **kwargs)
 
             end_time = time.perf_counter()
             total_duration = end_time - start_time

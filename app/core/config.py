@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     # Environment Logic
     DEBUG: bool = False
 
+    # PDF processing limits (0 = no limit)
+    PDF_MAX_PAGES: int = 0  # 0 = process all pages (e.g. long 10-K, manuals)
+    PDF_MAX_FILE_SIZE_MB: int = 0  # 0 = no file size limit
+
     # This will be crucial for Phase 2 (LLMs)
     # Marking it as optional for now so the app starts without it
     OPENAI_API_KEY: str | None = None

@@ -29,7 +29,10 @@ class VectorService:
         """Saves chunks into the vector database."""
         ids = [f"{document_name}_{i}" for i in range(len(chunks))]
         texts = [chunk.page_content for chunk in chunks]
-        metadatas = [{"source": document_name, **chunk.metadata} for chunk in chunks]
+        metadatas = [
+            {"source": document_name, **(getattr(chunk, "metadata", None) or {})}
+            for chunk in chunks
+        ]
 
         self.collection.upsert(
             ids=ids,
