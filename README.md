@@ -206,12 +206,6 @@ This ensures efficient resource management and graceful shutdown.
 ### Middleware
 - **CORS Middleware** - Configured to accept requests from any origin in development. Update `allow_origins` in production.
 
-## Roadmap
-
-- **Phase 1** ✅ Document processing pipeline with Docling
-- **Phase 2** 🔄 LLM integration with OpenAI for document understanding
-- **Phase 3** 📅 Knowledge graph generation
-- **Phase 4** 📅 Vector embeddings and semantic search
 
 ## Best Practices
 
