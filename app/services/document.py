@@ -1,25 +1,37 @@
+import asyncio
 import time
 from pathlib import Path
 
 from docling.datamodel.base_models import InputFormat
-from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.pipeline_options import PdfPipelineOptions, RapidOcrOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from loguru import logger
 
-from app.core.config import settings
 from app.schemas.document import ExtractionResult
 
 
 class DocumentProcessor:
     def __init__(self) -> None:
         logger.info("Initializing DocumentProcessor with Docling models...")
-        pipeline_options = PdfPipelineOptions()
-        # Use PDF text layer only; no OCR. Avoids RapidOCR "empty result" warnings for text-based PDFs.
-        # Set do_ocr=True only if you need to process scanned/image-only PDFs.
-        pipeline_options.do_ocr = False
-        pipeline_options.do_table_structure = True
+
+        # Configure OCR pipeline to fix RapidOCR empty result warnings.
+        # The default scale is too low for many scanned PDFs; raising it to 3.0
+        # gives RapidOCR larger images to detect text regions reliably.
+        # force_full_page_ocr ensures every page is OCR'd even if Docling
+        # thinks it already contains a text layer (common with hybrid PDFs).
+        ocr_options = RapidOcrOptions(
+            force_full_page_ocr=True,
+        )
+        pipeline_options = PdfPipelineOptions(
+            do_ocr=True,
+            ocr_options=ocr_options,
+        )
+        pipeline_options.images_scale = 3.0  # Increase render resolution for OCR
+
         self.converter = DocumentConverter(
-            format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
+            format_options={
+                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+            }
         )
 
     async def process_pdf(self, file_path: Path) -> ExtractionResult:
@@ -30,21 +42,20 @@ class DocumentProcessor:
         start_time = time.perf_counter()
 
         try:
-            # Optional limits for very large PDFs (0 = no limit)
-            kwargs: dict = {}
-            if settings.PDF_MAX_PAGES > 0:
-                kwargs["max_num_pages"] = settings.PDF_MAX_PAGES
-            if settings.PDF_MAX_FILE_SIZE_MB > 0:
-                kwargs["max_file_size"] = settings.PDF_MAX_FILE_SIZE_MB * 1024 * 1024
-
-            # The conversion process
-            result = self.converter.convert(file_path, **kwargs)
+            # Run the blocking Docling conversion in a thread pool so it does
+            # not freeze the FastAPI event loop during processing.
+            loop = asyncio.get_running_loop()
+            result = await loop.run_in_executor(
+                None, self.converter.convert, file_path
+            )
 
             end_time = time.perf_counter()
             total_duration = end_time - start_time
 
             # Metadata extraction
-            page_count = len(result.document.pages) if hasattr(result.document, "pages") else 1
+            page_count = (
+                len(result.document.pages) if hasattr(result.document, "pages") else 1
+            )
             avg_time_per_page = total_duration / page_count if page_count > 0 else 0
 
             # Professional Granular Logging
@@ -53,12 +64,15 @@ class DocumentProcessor:
             log.info(f"Total Time: {total_duration:.2f}s")
             log.info(f"Avg Time Per Page: {avg_time_per_page:.2f}s")
 
+            metadata_dict: dict = {}
+            if hasattr(result.document, "metadata"):
+                meta = result.document.metadata
+                metadata_dict = meta.model_dump() if hasattr(meta, "model_dump") else meta.dict()
+
             return ExtractionResult(
                 content=result.document.export_to_markdown(),
                 page_count=page_count,
-                metadata=result.document.metadata.dict()
-                if hasattr(result.document, "metadata")
-                else {},
+                metadata=metadata_dict,
                 processing_time_seconds=round(total_duration, 2),
             )
 
